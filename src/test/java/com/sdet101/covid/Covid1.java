@@ -1,54 +1,50 @@
-package Covid_assignment;
+package com.sdet101.covid;
 
 import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
-public class Covid {
+public class Covid1 {
 	
 	WebDriver driver;
 	@Test(priority=1)
 	public void openurl() throws InterruptedException
 	{
-		//											   C:\workspace\SDET101_Selenium\src\test\resources\drivers
-		System.setProperty("WebDriver.chrome.driver", "C:\\workspace\\SDET101_Selenium\\src\\test\\resources\\drivers\\chromedriver.exe");
-		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--remote-allow-origins=*");
-		ChromeDriver driver = new ChromeDriver(options);
-		
+		System.setProperty("WebDriver.chrome.driver", "C:\\Users\\swati\\eclipse-workspace\\SDET101_Selenium\\src\\test\\resources\\drivers\\chromedriver.exe");
+		WebDriver driver=new ChromeDriver();
 		driver.get("https://westbengal.covidsafe.in/");
 		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1000));
 		hospital_data(driver);
 	}
 	
-	public void hospital_data(WebDriver driver) throws InterruptedException
+	public void hospital_data(WebDriver driver) throws InterruptedException 
 	{
+		Actions actions= new Actions(driver);
+
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-		
-		int newListSize=0;
-		WebElement load20= null;
-		do 
+		WebElement load20= driver.findElement(By.xpath("//button[text()='Load next 20']"));
+		js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
+		while(load20!=null)
 		{
-			System.out.println("Starting......................");
-			int size = driver.findElements(By.xpath("//tbody/tr")).size();
+			Thread.sleep(1000);
+			load20.click();
+			js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
+		}
+		js.executeScript("window.scrollBy(document.body.scrollHeight,0)");
+	
+		int size = driver.findElements(By.xpath("//tbody/tr")).size();
 			System.out.println("Size: "+size);
-			System.out.println("newListSize"+newListSize);
-			if(size!=20) {
-				newListSize=size-20;
-				
-			}
-			for(int i=newListSize+1;i<=size;i++)
+			for(int i=1;i<=size;i++)
 			{
-			Actions actions= new Actions(driver);
 			WebElement hospital=driver.findElement(By.xpath("//tbody//tr["+i+"]//strong"));
 			String hospitalname= hospital.getText();
 			
@@ -84,24 +80,11 @@ public class Covid {
 			System.out.println("Total Beds : "+ totalbeds);
 		
 		    hospital.click();
-		   // Thread.sleep(500);
 		    
 		    actions.scrollByAmount(0, 120).perform();	
-		}
-			try {
-			load20= driver.findElement(By.xpath("//button[text()='Load next 20']"));
-			
-			
-			if(null!=load20)
-			load20.click();
-			}catch(org.openqa.selenium.NoSuchElementException e) {
-				System.out.println("Reached end of the page");
-				load20=null;
 			}
-			
-			
-		}while(load20!=null);
+		}
 		
-			
-	}
+	//}
 }
+
